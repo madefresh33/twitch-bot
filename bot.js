@@ -1,83 +1,89 @@
 const tmi = require("tmi.js");
 
-const client = new tmi.Client({
-  options: { debug: true },
-  connection: { reconnect: true, secure: true },
-  identity: {
-    username: process.env.BOT_USERNAME,
-    password: process.env.OAUTH_TOKEN
-  },
-  channels: [process.env.CHANNEL_NAME]
-});
-
-client.connect().catch(err => {
-  console.error("Connection failed:", err);
-});
-
-client.on("message", (channel, tags, message, self) => {
-  if (self) return;
-
-  if (message.toLowerCase() === "hello") {
-    client.say(channel, `Yo ${tags.username}, what's good on foe nem!`);
-  }
-});
-const chatters = [
-  { name: "onfoenem23", lines: [
-      "Daeski the GOAT fr fr 🔥",
-      "Whole city watching this man 🏆",
-      "On foe nem, that’s facts!"
-  ]},
-  { name: "shortyFrom79th", lines: [
-      "Aye this beat crazy 🎶",
-      "We outsideee 🚀",
-      "Daeski got Chicago turnt 💯"
-  ]},
-  { name: "madetowatch", lines: [
-      "Bro funny as hell 😂",
-      "This stream littyyyy 🔥🔥🔥",
-      "Tell ‘em Daeski!"
-  ]}
+// --- LIST OF BOT ACCOUNTS ---
+const bots = [
+  { username: process.env.BOT1_USERNAME, token: process.env.BOT1_TOKEN },
+  { username: process.env.BOT2_USERNAME, token: process.env.BOT2_TOKEN },
+  { username: process.env.BOT3_USERNAME, token: process.env.BOT3_TOKEN }
 ];
-function randomChatter() {
-  const chatter = chatters[Math.floor(Math.random() * chatters.length)];
-  const line = chatter.lines[Math.floor(Math.random() * chatter.lines.length)];
 
-  client.say(process.env.CHANNEL_NAME, `${chatter.name}: ${line}`);
+// --- CHANNEL TO JOIN ---
+const channel = process.env.CHANNEL_NAME;
+
+// --- MESSAGES TO ROTATE (No fake usernames) ---
+const chatMessages = [
+  "Daeski a GOAT fr fr 🔥",
+  "Whole city watching this man! 🏆",
+  "On foe nem, that’s facts!",
+  "bro crazy asl🙃",
+  "We outsideee? 🚀",
+  "gift me please 💯",
+  "bro funny as hell 😂",
+  "This stream lit🔥🔥🔥",
+  "keep up the good work!"
+  "cashapp me 🔥",
+  "mfks look dirty asl🙃",
+  "lOCK iN GANG 💯",
+  "MAJOR MOTION wit Daeski079 ✨"
+  "wya folks?",
+  "im trying to see some azz",
+  "cap alert 🔥",
+  "i dont know why mfks even come on here frfr!"
+  "didnt i see you on chicago mugshots?"
+  "Can I PULL UP BRO?"
+  "aRE U STILL GIVING MONEY AWAY?!"
+  "I SUBBED LIKE I PROMISED"
+];
+
+// --- FUNCTION TO START A SINGLE BOT ---
+function startBot(botConfig) {
+  const client = new tmi.Client({
+    options: { debug: true },
+    connection: { reconnect: true, secure: true },
+    identity: {
+      username: botConfig.username,
+      password: botConfig.token
+    },
+    channels: [channel]
+  });
+
+  client.connect()
+    .then(() => console.log(`${botConfig.username} connected on foe nem!`))
+    .catch(console.error);
+
+  // --- RANDOM AUTO-MESSAGES ---
+  setInterval(() => {
+    const msg = chatMessages[Math.floor(Math.random() * chatMessages.length)];
+    client.say(channel, msg);
+  }, Math.floor(Math.random() * (180000 - 120000) + 120000)); // 2-3 min random interval
+
+  // --- VIEWER COMMANDS ---
+  client.on("message", (chan, tags, message, self) => {
+    if (self) return; // ignore messages from the bot itself
+
+    const msg = message.toLowerCase();
+
+    if (msg === "hey") {
+      client.say(chan, `Yo ${tags.username}, what up friend?`);
+    }
+
+    if (msg === "!daeski") {
+      client.say(chan, "im a day 1 gang gift me💯");
+    }
+
+    if (msg === "lol") {
+      client.say(chan, "What i miss?");
+    }
+
+    if (msg === "ofn") {
+      client.say(chan, "LET’S GO!!!!!!!!!");
+    }
+
+    if (msg === "yooo") {
+      client.say(chan, "😂😂😂");
+    }
+  });
 }
-// Every minute, a random chatter speaks
-setInterval(randomChatter, Math.floor(Math.random() * (300000 - 120000)) + 120000);
-let lastChatterIndex = -1;
 
-function randomChatter() {
-  let index;
-  do {
-    index = Math.floor(Math.random() * chatters.length);
-  } while(index === lastChatterIndex);
-
-  lastChatterIndex = index;
-
-  const chatter = chatters[index];
-  const line = chatter.lines[Math.floor(Math.random() * chatter.lines.length)];
-
-  client.say(process.env.CHANNEL_NAME, `${chatter.name}: ${line}`);
-}
-client.on("message", (channel, tags, message, self) => {
-  if (self) return;
-
-  const msg = message.toLowerCase();
-
-  if (msg === "hello") {
-    client.say(channel, `Yo ${tags.username}, what's good on foe nem!`);
-  }
-
-  if (msg === "!daeski") {
-    client.say(channel, "wtf?🔥");
-  }
-
-  if (msg === "!onfoenem") {
-    client.say(channel, "yall outside on foe nem 💯");
-  }
-});
-setInterval(randomChatter, 2 * 60 * 1000); // every 2 minutes
-
-
+// --- START ALL BOTS ---
+bots.forEach(bot => startBot(bot));
