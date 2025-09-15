@@ -15,7 +15,7 @@ const bots = [
 // --- CHANNEL TO JOIN ---
 const channel = process.env.CHANNEL_NAME;
 
-// --- MESSAGES TO ROTATE (No fake usernames) ---
+// --- MESSAGES TO ROTATE ---
 const chatMessages = [
   "Daeski a GOAT fr fr 🔥",
   "Whole city watching this man! 🏆",
@@ -56,44 +56,29 @@ function startBot(botConfig) {
     .then(() => console.log(`${botConfig.username} connected on foe nem!`))
     .catch(console.error);
 
-  // --- RANDOM AUTO-MESSAGES (15–60 sec) ---
-  function sendRandomMessage() {
-    const msg = chatMessages[Math.floor(Math.random() * chatMessages.length)];
-    client.say(channel, msg);
+  // --- RANDOM AUTO-MESSAGES AFTER CONNECTION ---
+  client.on("connected", () => {
+    function sendRandomMessage() {
+      const msg = chatMessages[Math.floor(Math.random() * chatMessages.length)];
+      client.say(channel, msg).catch(console.error);
 
-    // Schedule next message randomly between 15–60 seconds
-    const nextInterval = Math.floor(Math.random() * (60000 - 15000) + 15000);
-    setTimeout(sendRandomMessage, nextInterval);
-  }
-
-  // Start sending messages
-  sendRandomMessage();
+      const nextInterval = Math.floor(Math.random() * (60000 - 15000) + 15000); // 15-60 sec
+      setTimeout(sendRandomMessage, nextInterval);
+    }
+    sendRandomMessage();
+  });
 
   // --- VIEWER COMMANDS ---
   client.on("message", (chan, tags, message, self) => {
-    if (self) return; // ignore messages from the bot itself
+    if (self) return; // ignore bot messages
 
     const msg = message.toLowerCase();
 
-    if (msg === "hey") {
-      client.say(chan, `Yo ${tags.username}, what up friend?`);
-    }
-
-    if (msg === "!daeski") {
-      client.say(chan, "im a day 1 gang gift me💯");
-    }
-
-    if (msg === "lol") {
-      client.say(chan, "What i miss?");
-    }
-
-    if (msg === "ofn") {
-      client.say(chan, "LET’S GO!!!!!!!!!");
-    }
-
-    if (msg === "yooo") {
-      client.say(chan, "😂😂😂");
-    }
+    if (msg === "hey") client.say(chan, `Yo ${tags.username}, what up friend?`).catch(console.error);
+    if (msg === "!daeski") client.say(chan, "im a day 1 gang gift me💯").catch(console.error);
+    if (msg === "lol") client.say(chan, "What i miss?").catch(console.error);
+    if (msg === "ofn") client.say(chan, "LET’S GO!!!!!!!!!").catch(console.error);
+    if (msg === "yooo") client.say(chan, "😂😂😂").catch(console.error);
   });
 }
 
