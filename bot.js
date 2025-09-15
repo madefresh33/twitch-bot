@@ -1,4 +1,3 @@
-require("dotenv").config();
 const tmi = require("tmi.js");
 
 const client = new tmi.Client({
@@ -22,3 +21,4 @@ client.on("message", (channel, tags, message, self) => {
     client.say(channel, `Yo ${tags.username}, what's good on foe nem!`);
   }
 });
+
